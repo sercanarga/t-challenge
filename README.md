@@ -2,10 +2,6 @@
 
 This project is an API service developed in Go. It is a simple banking system that allows users to send money to each other. The project is dockerized and can be run with a single command. The project uses Postgres as a database and has a scalable structure. The project has a user authentication system and uses JWT for this. The project has a simple structure and can be developed further.
 
-### Work Notes
-These are the notes I took before I started working. They may not reflect the final version.
-![Notes](https://github.com/sercanarga/t-challenge/blob/main/assets/notes.png?raw=true)
-
 ### Features
 - [x] General
     - [x] Go 1.16 >
@@ -25,6 +21,10 @@ These are the notes I took before I started working. They may not reflect the fi
   - [x] Transaction logs
   - [ ] Transaction fees
   - [ ] Email/SMS notifications
+
+### Work Notes
+These are the notes I took before I started working. They may not reflect the final version.
+![Notes](https://github.com/sercanarga/t-challenge/blob/main/assets/notes.png?raw=true)
 
 ### Installation
 
