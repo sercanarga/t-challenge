@@ -56,6 +56,9 @@ docker-compose up --build -d
 ### Endpoints
 [postman.com/t-challenge](http://postman.com/sercanarga/workspace/t-challenge)
 
+### Docker Structure
+![Database Diagram](https://github.com/sercanarga/t-challenge/blob/main/assets/docker.png?raw=true)
+
 ### Database Diagram
 ![Database Diagram](https://github.com/sercanarga/t-challenge/blob/main/assets/db_scheme.png?raw=true)
 
