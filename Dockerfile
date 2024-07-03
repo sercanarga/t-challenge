@@ -3,6 +3,7 @@ WORKDIR /app
 
 COPY . .
 
+# @note: go mod tidy is not recommended for live projects. use: go mod download
 RUN go mod tidy && go mod verify
 RUN CGO_ENABLED=0 go build -o service cmd/service/main.go
 
