@@ -1,0 +1,51 @@
+services:
+  # Postgres service
+  postgres:
+    image: postgres:latest
+    environment:
+      PGUSER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - service-network
+    ports:
+      - "${DATABASE_PORT}:${DATABASE_PORT}"
+    expose:
+      - ${DATABASE_PORT}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  # Backend service
+  backend-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    deploy:
+        replicas: 2 # Scale the service to 2 instances
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - service-network
+    env_file:
+      - .env
+  # Load balancer
+  lb:
+    build: ./nginx
+    container_name: load_balancer
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    networks:
+      - service-network
+    depends_on:
+      - backend-service
+networks:
+  service-network:
+    driver: bridge
+
+volumes:
+  db-data:
