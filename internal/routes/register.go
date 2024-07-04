@@ -34,8 +34,12 @@ func Register(mux *http.ServeMux) {
 			return
 		}
 
+		db := durable.Connection()
+		tx := db.Begin()
+
 		// Check if user already exists
 		if durable.Connection().Where("email = ?", rBody.Email).First(&model.User{}).RowsAffected != 0 {
+			tx.Rollback()
 			response.WriteResponse(w, &response.Response{
 				Status:  http.StatusForbidden,
 				Success: false,
@@ -46,6 +50,7 @@ func Register(mux *http.ServeMux) {
 
 		hashedPassword, err := durable.HashPassword(rBody.Password)
 		if err != nil {
+			tx.Rollback()
 			response.WriteResponse(w, &response.Response{
 				Status:  http.StatusInternalServerError,
 				Success: false,
@@ -63,7 +68,8 @@ func Register(mux *http.ServeMux) {
 			Password: hashedPassword,
 			Status:   true,
 		}
-		if err := durable.Connection().Create(newUser).Error; err != nil {
+		if err := tx.Create(newUser).Error; err != nil {
+			tx.Rollback()
 			response.WriteResponse(w, &response.Response{
 				Status:  http.StatusInternalServerError,
 				Success: false,
@@ -80,7 +86,8 @@ func Register(mux *http.ServeMux) {
 			UserUUID:      userUUID.String(),
 			AccountNumber: durable.GenerateAccountNumber(),
 		}
-		if err := durable.Connection().Create(account).Error; err != nil {
+		if err := tx.Create(account).Error; err != nil {
+			tx.Rollback()
 			response.WriteResponse(w, &response.Response{
 				Status:  http.StatusInternalServerError,
 				Success: false,
@@ -95,7 +102,8 @@ func Register(mux *http.ServeMux) {
 			AccountUUID: account.UUID,
 			Balance:     durable.GenerateAmount(), // initial balance
 		}
-		if err := durable.Connection().Create(balance).Error; err != nil {
+		if err := tx.Create(balance).Error; err != nil {
+			tx.Rollback()
 			response.WriteResponse(w, &response.Response{
 				Status:  http.StatusInternalServerError,
 				Success: false,
@@ -104,6 +112,7 @@ func Register(mux *http.ServeMux) {
 			return
 		}
 
+		tx.Commit()
 		response.WriteResponse(w, &response.Response{
 			Status:  http.StatusCreated,
 			Success: true,
